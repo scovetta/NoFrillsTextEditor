@@ -13,8 +13,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    customplaintextedit.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    customplaintextedit.h
 
 FORMS    += mainwindow.ui
+
+DISTFILES += \
+    ../../../Downloads/favicon (2).ico \
+    ../../../Downloads/favicon (2).ico

@@ -1,11 +1,18 @@
-#ifndef CUSTOMTEXTEDIT_H
-#define CUSTOMTEXTEDIT_H
+#ifndef CUSTOMPLAINTEXTEDIT_H
+#define CUSTOMPLAINTEXTEDIT_H
 
+#include <QPlainTextEdit>
+#include <QApplication>
+#include <Qt>
+#include <QPlainTextEdit>
+#include <QDebug>
 
-class CustomTextEdit : public QPlainTextEdit
+class CustomPlainTextEdit : public QPlainTextEdit
 {
 public:
-    CustomTextEdit();
+    CustomPlainTextEdit(QWidget *parent = 0);
+protected:
+    virtual void wheelEvent( QWheelEvent * inEvent );
 };
 
-#endif // CUSTOMTEXTEDIT_H
+#endif // CUSTOMPLAINTEXTEDIT_H
