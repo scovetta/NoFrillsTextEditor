@@ -7,10 +7,16 @@
 #include <QPlainTextEdit>
 #include <QDebug>
 
+/**
+ * @brief The CustomPlainTextEdit class
+ * This class overrides the default QPlainTextEdit object
+ * with customizations for the editor.
+ */
 class CustomPlainTextEdit : public QPlainTextEdit
 {
 public:
     CustomPlainTextEdit(QWidget *parent = 0);
+
 protected:
     virtual void wheelEvent( QWheelEvent * inEvent );
 };

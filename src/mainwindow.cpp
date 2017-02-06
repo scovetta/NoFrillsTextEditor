@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "include/mainwindow.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -10,13 +10,50 @@ MainWindow::MainWindow(QWidget *parent) :
     QFont font("Monospace");
     font.setStyleHint(QFont::TypeWriter);
     ui->plainTextEdit->setFont(font);
-
+    this->readSettings();
     QGuiApplication::setWindowIcon(QIcon(QString("/home/scovetta/Documents/NoFrillsTextEditor/NoFrillsTextEditor/nofrills.ico")));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    qDebug() << "closeEvent()";
+    this->on_actionExit_triggered();
+
+    if (event != NULL) {
+        event->accept();
+        //QMainWindow::closeEvent(event);
+    }
+}
+
+void MainWindow::saveAllState()
+{
+    qDebug() << "saveAllState()";
+    QSettings settings("NoFrills", "NoFrillsTextEditor");
+    settings.setValue("mainwindow/geometry", saveGeometry());
+    settings.setValue("mainwindow/windowState", saveState());
+
+    QFont font = ui->plainTextEdit->font();
+    settings.setValue("mainwindow/fontFamily", font.family());
+    settings.setValue("mainwindow/fontSize", font.pointSize());
+}
+
+void MainWindow::readSettings()
+{
+    QSettings settings("NoFrills", "NoFrillsTextEditor");
+    restoreGeometry(settings.value("mainwindow/geometry").toByteArray());
+    restoreState(settings.value("mainwindow/windowState").toByteArray());
+
+    if (settings.contains("mainwindow/fontFamily")) {
+        QFont font = QFont(settings.value("mainwindow/fontFamily").toString(),
+                           settings.value("mainwindow/fontSize").toInt());
+        ui->plainTextEdit->setFont(font);
+    }
+
 }
 
 /**
@@ -29,7 +66,10 @@ void MainWindow::reset()
     ui->plainTextEdit->scroll(0, 0);
     ui->plainTextEdit->setProperty("filename", QVariant());
     ui->plainTextEdit->setProperty("modified", QVariant(false));
+
+    this->connect(ui->plainTextEdit, SIGNAL(textChanged()), this, SLOT(on_plainTextEdit_textChanged()), Qt::UniqueConnection);
     this->setWindowTitle(QString(PROGRAM_NAME));
+    ui->actionSave->setEnabled(false);
 }
 
 /**
@@ -151,6 +191,9 @@ bool MainWindow::do_save()
     out.flush();
     file.close();
 
+    this->connect(ui->plainTextEdit, SIGNAL(textChanged()), this, SLOT(on_plainTextEdit_textChanged()), Qt::UniqueConnection);
+    ui->plainTextEdit->setProperty("modified", QVariant(false));
+
     return true;
 }
 
@@ -160,7 +203,9 @@ bool MainWindow::do_save()
  */
 void MainWindow::on_plainTextEdit_textChanged()
 {
+    qDebug() << "on_plainTextEdit_textChanged()";
     ui->plainTextEdit->setProperty("modified", QVariant(true));
+    this->disconnect(ui->plainTextEdit, SIGNAL(textChanged()), this, SLOT(on_plainTextEdit_textChanged()));
 }
 
 /**
@@ -179,11 +224,13 @@ void MainWindow::on_actionExit_triggered()
                     filename = this->ask_for_filename();
                 }
                 this->do_save();
-                qApp->exit(0);
+                this->saveAllState();
+                qApp->quit();
                 break;
 
             case (QMessageBox::No):
-                qApp->exit(0);
+                this->saveAllState();
+                qApp->quit();
                 break;
 
             case (QMessageBox::Cancel):
@@ -191,7 +238,8 @@ void MainWindow::on_actionExit_triggered()
                 break;
         }
     } else {
-        qApp->exit(0);
+        this->saveAllState();
+        qApp->quit();
     }
 }
 
@@ -217,6 +265,7 @@ void MainWindow::do_open(QString filename)
         truncFileName = QString("...") + truncFileName.right(40);
     }
     this->setWindowTitle(QString(PROGRAM_NAME) + QString(" - ") + truncFileName);
+    ui->actionSave->setEnabled(true);
 
     // Scroll to top
     ui->plainTextEdit->scroll(0, 0);
@@ -275,12 +324,23 @@ void MainWindow::on_actionSave_As_triggered()
         }
 
         this->setWindowTitle(QString(PROGRAM_NAME) + QString(" - ") + truncFileName);
-
+        ui->actionSave->setEnabled(true);
         this->do_save();
     }
 }
 
-void MainWindow::on_actionHome_Page_triggered()
+void MainWindow::on_actionAbout_triggered()
 {
-    QDesktopServices::openUrl(QUrl("https://github.com/scovetta/nofrillstexteditor"));
+    QMessageBox msgBox;
+    msgBox.setText(QString(PROGRAM_NAME) + QString(" v") + QString(PROGRAM_VERSION));
+
+    msgBox.addButton(tr("Close"), QMessageBox::NoRole);
+    QPushButton* pButtonHomePage = msgBox.addButton(tr("Home Page"), QMessageBox::NoRole);
+    msgBox.exec();
+
+    if ((QPushButton*)(msgBox.clickedButton()) == pButtonHomePage) {
+        QDesktopServices::openUrl(QUrl("https://github.com/scovetta/nofrillstexteditor"));
+    } else {
+        // don't do anything, just close
+    }
 }

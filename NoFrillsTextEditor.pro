@@ -11,16 +11,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = NoFrillsTextEditor
 TEMPLATE = app
 
+SOURCES +=  src/main.cpp\
+            src/mainwindow.cpp \
+            src/customplaintextedit.cpp
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    customplaintextedit.cpp
+HEADERS +=  include/mainwindow.h \
+            include/customplaintextedit.h
 
-HEADERS  += mainwindow.h \
-    customplaintextedit.h
-
-FORMS    += mainwindow.ui
-
-DISTFILES += \
-    ../../../Downloads/favicon (2).ico \
-    ../../../Downloads/favicon (2).ico
+FORMS   +=  ui/mainwindow.ui
