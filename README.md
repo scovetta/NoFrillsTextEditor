@@ -8,6 +8,8 @@ to meet (very specific) needs.
 I wrote it because I wanted to learn Qt programming, and thought
 it would be a good exercise.
 
+![screenshot](https://github.com/scovetta/NoFrillsTextEditor/blob/master/doc/screenshot.png)
+
 ### Building
 
 To build the project, you must first have Qt 5 installed. Then run:
@@ -21,3 +23,6 @@ The final executable will be in `build/release`.
 
 Just start `build/release/NoFrillsTextEditor`.
 
+### Using
+
+The program functions like any ordinary text editor. Ctrl-Scroll changes the font size, and window state is automatically saved and restored.
